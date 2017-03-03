@@ -5,5 +5,5 @@
   "src_files": ["src/**/*", "test/**/*"],
   "disable_watching": true,
   "launch_in_ci": ["phantomjs"],
-  "port": 0
+  "port": 3000
 }
