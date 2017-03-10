@@ -4,5 +4,5 @@
   "before_tests": "npm run build:tests",
   "src_files": ["src/**/*", "test/**/*"],
   "launch_in_ci": ["phantomjs"],
-  "port": 0
+  "port": 3000
 }
