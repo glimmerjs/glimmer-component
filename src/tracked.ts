@@ -1,6 +1,11 @@
 import { Tag, DirtyableTag, TagWrapper, combine, CONSTANT_TAG } from '@glimmer/reference';
 import { dict, Dict } from '@glimmer/util';
 
+/**
+ * A decorator that marks a property as being tracked. If a property is tracked,
+ * Glimmer will automatically update the DOM when that property is changed.
+ * @param dependencies
+ */
 export function tracked(...dependencies: string[]): MethodDecorator;
 export function tracked(target: any, key: any): any;
 export function tracked(target: any, key: any, descriptor: PropertyDescriptor): PropertyDescriptor;

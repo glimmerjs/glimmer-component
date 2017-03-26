@@ -30,6 +30,7 @@ export abstract class ComponentPathReference<T> implements PathReference<T> {
   }
 }
 
+/** @external */
 export abstract class CachedReference<T> extends ComponentPathReference<T> {
   private _lastRevision: number | null = null;
   private _lastValue: any = null;

@@ -1,0 +1,16 @@
+{
+  "manifest" : {
+    "title": "My docs site",
+    "intro": "Everything is awesome"
+  },
+  "projects": [
+    {
+      "src": "src/",
+      "include": [
+        "Component",
+        "tracked"
+      ]
+    }
+  ],
+  "output": "out.json"
+}
