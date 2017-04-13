@@ -171,7 +171,7 @@ test('interceptor works correctly for own value descriptor', (assert) => {
 });
 
 test('interceptor works correctly for inherited value descriptor', (assert) => {
-  class Person { }
+  class Person { name: string }
   Person.prototype.name = 'Martin';
 
   interface Person {
@@ -201,7 +201,7 @@ test('interceptor works correctly for own getter descriptor', (assert) => {
   assert.strictEqual(obj.name, 'Martin');
 
   assert.throws(() => {
-    obj.name = 'Tom';
+    (obj as any).name = 'Tom';
   }, UntrackedPropertyError.for(obj, 'name'));
 });
 
@@ -219,7 +219,7 @@ test('interceptor works correctly for inherited getter descriptor', (assert) => 
   assert.strictEqual(obj.name, 'Martin');
 
   assert.throws(() => {
-    obj.name = 'Tom';
+    (obj as any).name = 'Tom';
   }, UntrackedPropertyError.for(obj, 'name'));
 });
 
@@ -237,7 +237,7 @@ test('interceptor is not installed for own non-configurable descriptor', (assert
 });
 
 test('interceptor works correctly for inherited non-configurable descriptor', (assert) => {
-  class Person { }
+  class Person { name: string }
   Person.prototype.name = 'Martin';
   Object.defineProperty(Person.prototype, 'name', { configurable: false });
 
