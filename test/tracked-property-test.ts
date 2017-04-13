@@ -111,15 +111,16 @@ test('can track a computed property', (assert) => {
 
 test('tracked computed properties are invalidated when their dependencies are invalidated', (assert) => {
   class TrackedPerson {
-    @tracked('fullName')
+    @tracked
     get salutation() {
       return `Hello, ${this.fullName}!`;
     }
 
-    @tracked('firstName', 'lastName')
+    @tracked
     get fullName() {
       return `${this.firstName} ${this.lastName}`
     }
+
     set fullName(fullName) {
       let [firstName, lastName] = fullName.split(' ');
       this.firstName = firstName;
@@ -131,8 +132,8 @@ test('tracked computed properties are invalidated when their dependencies are in
   }
 
   let obj = new TrackedPerson();
-  assert.strictEqual(obj.salutation, 'Hello, Tom Dale!');
-  assert.strictEqual(obj.fullName, 'Tom Dale');
+  assert.strictEqual(obj.salutation, 'Hello, Tom Dale!', `the saluation field is valid`);
+  assert.strictEqual(obj.fullName, 'Tom Dale', `the fullName field is valid`);
 
   let tag = tagForProperty(obj, 'salutation');
   let snapshot = tag.value();
@@ -250,6 +251,26 @@ test('interceptor is not installed for own non-configurable descriptor', (assert
   obj.name = 'Tom';
 
   assert.strictEqual(obj.name, 'Tom');
+});
+
+test('interceptor works correctly for inherited non-configurable descriptor', (assert) => {
+  class Person { }
+  Person.prototype.name = 'Martin';
+  Object.defineProperty(Person.prototype, 'name', { configurable: false });
+
+  interface Person {
+    name: string;
+  }
+
+  let obj = new Person();
+
+  tagForProperty(obj, 'name');
+
+  assert.strictEqual(obj.name, 'Martin');
+
+  assert.throws(() => {
+    obj.name = 'Tom';
+  }, UntrackedPropertyError.for(obj, 'name'));
 });
 
 test('interceptor is not installed for array length [issue #34]', (assert) => {
