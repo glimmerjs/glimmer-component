@@ -254,7 +254,7 @@ test('interceptor is not installed for own non-configurable descriptor', (assert
 });
 
 test('interceptor works correctly for inherited non-configurable descriptor', (assert) => {
-  class Person { }
+  class Person { name: string }
   Person.prototype.name = 'Martin';
   Object.defineProperty(Person.prototype, 'name', { configurable: false });
 
