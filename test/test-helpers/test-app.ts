@@ -1,5 +1,6 @@
 import Application from '@glimmer/application';
 import Resolver, { BasicModuleRegistry } from '@glimmer/resolver';
+import { DirtyableTag } from '@glimmer/reference';
 
 import ComponentManager from '../../src/component-manager';
 import { precompile } from './compiler';

@@ -108,15 +108,16 @@ test('can track a computed property', (assert) => {
 
 test('tracked computed properties are invalidated when their dependencies are invalidated', (assert) => {
   class TrackedPerson {
-    @tracked('fullName')
+    @tracked
     get salutation() {
       return `Hello, ${this.fullName}!`;
     }
 
-    @tracked('firstName', 'lastName')
+    @tracked
     get fullName() {
       return `${this.firstName} ${this.lastName}`
     }
+
     set fullName(fullName) {
       let [firstName, lastName] = fullName.split(' ');
       this.firstName = firstName;
@@ -128,8 +129,8 @@ test('tracked computed properties are invalidated when their dependencies are in
   }
 
   let obj = new TrackedPerson();
-  assert.strictEqual(obj.salutation, 'Hello, Tom Dale!');
-  assert.strictEqual(obj.fullName, 'Tom Dale');
+  assert.strictEqual(obj.salutation, 'Hello, Tom Dale!', `the saluation field is valid`);
+  assert.strictEqual(obj.fullName, 'Tom Dale', `the fullName field is valid`);
 
   let tag = tagForProperty(obj, 'salutation');
   let snapshot = tag.value();
@@ -172,6 +173,10 @@ test('interceptor works correctly for own value descriptor', (assert) => {
 test('interceptor works correctly for inherited value descriptor', (assert) => {
   class Person { }
   Person.prototype.name = 'Martin';
+
+  interface Person {
+    name: string;
+  }
 
   let obj = new Person();
 
@@ -235,6 +240,10 @@ test('interceptor works correctly for inherited non-configurable descriptor', (a
   class Person { }
   Person.prototype.name = 'Martin';
   Object.defineProperty(Person.prototype, 'name', { configurable: false });
+
+  interface Person {
+    name: string;
+  }
 
   let obj = new Person();
 
