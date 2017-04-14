@@ -156,6 +156,86 @@ test('tracked computed properties are invalidated when their dependencies are in
   assert.strictEqual(tag.validate(snapshot), true);
 });
 
+
+test('nested @tracked in multiple objects', (assert) => {
+  class TrackedPerson {
+    @tracked
+    get salutation() {
+      return `Hello, ${this.fullName}!`;
+    }
+
+    @tracked
+    get fullName(): string {
+      return `${this.firstName} ${this.lastName}`
+    }
+
+    set fullName(fullName: string) {
+      let [firstName, lastName] = fullName.split(' ');
+      this.firstName = firstName;
+      this.lastName = lastName;
+    }
+
+    toString() {
+      return this.fullName;
+    }
+
+    @tracked firstName = 'Tom';
+    @tracked lastName = 'Dale';
+  }
+
+  class TrackedContact {
+    @tracked email: string;
+    @tracked person: TrackedPerson;
+
+    constructor(person: TrackedPerson, email: string) {
+      this.person = person;
+      this.email = email;
+    }
+
+    @tracked get contact(): string {
+      return `${this.person} @ ${this.email}`
+    }
+  }
+
+  let obj = new TrackedContact(new TrackedPerson(), 'tom@example.com');
+  assert.strictEqual(obj.contact, 'Tom Dale @ tom@example.com', `the contact field is valid`);
+  assert.strictEqual(obj.person.fullName, 'Tom Dale', `the fullName field is valid`);
+  let person = obj.person;
+
+  let tag = tagForProperty(obj, 'contact');
+  let snapshot = tag.value();
+  assert.ok(tag.validate(snapshot), 'tag should be valid to start');
+
+  person.firstName = 'Edsger';
+  person.lastName = 'Dijkstra';
+  assert.strictEqual(tag.validate(snapshot), false, 'tag is invalidated after nested dependency is set');
+  assert.strictEqual(person.fullName, 'Edsger Dijkstra');
+  assert.strictEqual(obj.contact, 'Edsger Dijkstra @ tom@example.com');
+
+  snapshot = tag.value();
+  assert.strictEqual(tag.validate(snapshot), true);
+
+  person.fullName = 'Alan Kay';
+  assert.strictEqual(tag.validate(snapshot), false, 'tag is invalidated after chained dependency is set');
+  assert.strictEqual(person.fullName, 'Alan Kay');
+  assert.strictEqual(person.firstName, 'Alan');
+  assert.strictEqual(person.lastName, 'Kay');
+  assert.strictEqual(obj.contact, 'Alan Kay @ tom@example.com');
+
+  snapshot = tag.value();
+  assert.strictEqual(tag.validate(snapshot), true);
+
+  obj.email = "alan@example.com";
+  assert.strictEqual(tag.validate(snapshot), false, 'tag is invalidated after chained dependency is set');
+  assert.strictEqual(person.fullName, 'Alan Kay');
+  assert.strictEqual(person.firstName, 'Alan');
+  assert.strictEqual(person.lastName, 'Kay');
+  assert.strictEqual(obj.contact, 'Alan Kay @ alan@example.com');
+
+  snapshot = tag.value();
+  assert.strictEqual(tag.validate(snapshot), true);
+});
+
 module('Tracked Properties - Mandatory @tracked');
 
 test('interceptor works correctly for own value descriptor', (assert) => {
