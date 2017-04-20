@@ -1,5 +1,5 @@
 import { Simple } from '@glimmer/runtime';
-import { metaFor } from './tracked';
+import { tracked } from './tracked';
 
 /**
  * The `Component` class defines an encapsulated UI element that is rendered to
@@ -162,19 +162,7 @@ class Component {
    * ```
    *
    */
-  get args() {
-    return this.__args__;
-  }
-
-  set args(args) {
-    this.__args__ = args;
-    metaFor(this).dirtyableTagFor('args').inner.dirty();
-  }
-
-  /** @private
-   * Slot on the component to save Arguments object passed to the `args` setter.
-   */
-  private __args__: any = null;
+  @tracked args: object;
 
   static create(injections: any) {
     return new this(injections);
