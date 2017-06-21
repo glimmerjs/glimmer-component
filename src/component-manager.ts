@@ -75,7 +75,7 @@ class LayoutCompiler {
 }
 
 export default class ComponentManager implements GlimmerComponentManager<ComponentStateBucket> {
-  private env: Environment;
+  protected env: Environment;
 
   static create(options: ConstructorOptions): ComponentManager {
     return new ComponentManager(options);
