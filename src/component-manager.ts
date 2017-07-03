@@ -14,7 +14,8 @@ import {
   Template,
   CapturedArguments,
   compileLayout,
-  ComponentLayoutBuilder
+  ComponentLayoutBuilder,
+  PreparedArguments
 } from "@glimmer/runtime";
 import {
   TemplateMeta
@@ -22,7 +23,7 @@ import {
 import Component from "./component";
 import ComponentDefinition from "./component-definition";
 import { RootReference } from "./references";
-import { Dict, Destroyable, Opaque } from "@glimmer/util";
+import { Dict, Destroyable, Opaque, Option } from "@glimmer/util";
 import { Tag } from "@glimmer/reference";
 import { Simple } from "@glimmer/interfaces";
 
@@ -74,7 +75,7 @@ class LayoutCompiler {
 }
 
 export default class ComponentManager implements GlimmerComponentManager<ComponentStateBucket> {
-  private env: Environment;
+  protected env: Environment;
 
   static create(options: ConstructorOptions): ComponentManager {
     return new ComponentManager(options);
@@ -84,7 +85,19 @@ export default class ComponentManager implements GlimmerComponentManager<Compone
     this.env = options.env;
   }
 
-  prepareArgs(definition: ComponentDefinition, args: Arguments): null {
+  prepareArgs(definition: ComponentDefinition, args: Arguments): Option<PreparedArguments> {
+    let firstPositionalArg = args.positional.capture().at(0);
+
+    if (!firstPositionalArg) {
+      return null;
+    }
+
+    let renderComponentArgs = firstPositionalArg.value() as Option<PreparedArguments>;
+
+    if (renderComponentArgs && renderComponentArgs.positional && renderComponentArgs.named) {
+      return renderComponentArgs;
+    }
+
     return null;
   }
 
